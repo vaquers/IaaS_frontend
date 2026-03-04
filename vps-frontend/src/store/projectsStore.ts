@@ -6,6 +6,8 @@ import type {
   ProjectTab,
   VM
 } from '../domain/iaasTypes';
+import { api } from '../services/api';
+import type { CreateProjectPayload } from '../services/api';
 
 interface UiState {
   selectedProjectId?: string;
@@ -27,6 +29,11 @@ export interface ProjectsState extends UiState {
   addProject(project: Omit<Project, 'id' | 'createdAt' | 'checklist'>): string;
   addToast(message: string): void;
   clearToast(): void;
+  isLoading: boolean;
+  apiError: string | undefined;
+  loadProjects(): Promise<void>;
+  createProjectRemote(payload: CreateProjectPayload): Promise<string>;
+  deleteProjectRemote(id: string): Promise<void>;
 }
 
 let toastIdCounter = 1;
@@ -280,12 +287,14 @@ function createMockProjects(): Project[] {
 }
 
 export const useProjectsStore = create<ProjectsState>((set, get) => ({
-  projects: createMockProjects(),
-  nextId: 4,
+  projects: [],
+  nextId: 1,
   selectedProjectId: undefined,
   selectedProjectTab: 'overview',
   highlightedVmId: undefined,
   toast: undefined,
+  isLoading: false,
+  apiError: undefined,
 
   setSelectedProject(projectId) {
     set({ selectedProjectId: projectId, selectedProjectTab: 'overview' });
@@ -385,7 +394,49 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
   clearToast() {
     if (!get().toast) return;
     set({ toast: undefined });
-  }
+  },
+
+  async loadProjects() {
+    set({ isLoading: true, apiError: undefined });
+    try {
+      const projects = await api.listProjects();
+      set({ projects, isLoading: false });
+    } catch (e) {
+      set({ isLoading: false, apiError: String(e) });
+    }
+  },
+
+  async createProjectRemote(payload) {
+    set({ isLoading: true, apiError: undefined });
+    try {
+      const project = await api.createProject(payload);
+      set((state) => ({
+        projects: [...state.projects, project],
+        isLoading: false,
+        selectedProjectId: project.id,
+        selectedProjectTab: 'overview',
+      }));
+      return project.id;
+    } catch (e) {
+      set({ isLoading: false, apiError: String(e) });
+      throw e;
+    }
+  },
+
+  async deleteProjectRemote(id) {
+    set({ isLoading: true });
+    try {
+      await api.deleteProject(id);
+      set((state) => ({
+        projects: state.projects.filter((p) => p.id !== id),
+        isLoading: false,
+        selectedProjectId: state.selectedProjectId === id ? undefined : state.selectedProjectId,
+      }));
+    } catch (e) {
+      set({ isLoading: false, apiError: String(e) });
+      throw e;
+    }
+  },
 }));
 
 export function findProjectVmById(

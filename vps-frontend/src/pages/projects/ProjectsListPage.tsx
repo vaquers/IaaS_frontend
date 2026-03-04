@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useProjectsStore } from '../../store/projectsStore';
 import type { ProjectStatus, ProjectTemplate } from '../../domain/iaasTypes';
 import './ProjectsPages.css';
@@ -92,6 +92,12 @@ export function ProjectsListPage() {
   const navigate = useNavigate();
   const projects = useProjectsStore((state) => state.projects);
   const setSelectedProject = useProjectsStore((state) => state.setSelectedProject);
+  const loadProjects = useProjectsStore((state) => state.loadProjects);
+  const isLoading = useProjectsStore((state) => state.isLoading);
+
+  useEffect(() => {
+    void loadProjects();
+  }, [loadProjects]);
 
   const [search, setSearch] = useState('');
   const [template, setTemplate] = useState<ProjectTemplate | 'all'>('all');
@@ -171,6 +177,8 @@ export function ProjectsListPage() {
               <option value="error">Ошибка</option>
             </select>
           </div>
+
+          {isLoading && <p className="page-text">Загрузка проектов…</p>}
 
           {projectCount === 0 ? (
             <div className="projects-empty">

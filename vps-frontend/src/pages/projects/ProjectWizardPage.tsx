@@ -49,8 +49,8 @@ const TEMPLATES: { id: ProjectTemplate; title: string; text: string }[] = [
 
 export function ProjectWizardPage() {
   const navigate = useNavigate();
-  const addProject = useProjectsStore((state) => state.addProject);
-  const setStatus = useProjectsStore((state) => state.setProjectStatus);
+  const createProjectRemote = useProjectsStore((state) => state.createProjectRemote);
+  const isLoading = useProjectsStore((state) => state.isLoading);
 
   const [step, setStep] = useState<WizardStep>(1);
   const [template, setTemplate] = useState<ProjectTemplate | null>('SaaS');
@@ -73,7 +73,7 @@ export function ProjectWizardPage() {
     setStep((prev) => (prev > 1 ? ((prev - 1) as WizardStep) : prev));
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!template || !region) return;
 
     const baseName =
@@ -102,218 +102,30 @@ export function ProjectWizardPage() {
         ? 'SaaS-приложение с фронтендом и базой.'
         : 'Инфраструктура под ваш проект.';
 
-    const resources = (() => {
+    const vms = (() => {
       if (template === 'VPN') {
-        return {
-          vms: [
-            {
-              id: 'new-vm-vpn',
-              projectId: '',
-              name: 'vpn-gateway',
-              role: 'vpn' as const,
-              os: 'Ubuntu 24.04',
-              cpu: 1,
-              ram: 2,
-              disk: 30,
-              publicIp: '0.0.0.0',
-              privateIp: '10.0.40.10',
-              state: 'provisioning' as const,
-              monthlyCost: 14,
-              portsOpen: [22, 51820]
-            }
-          ],
-          networks: [
-            {
-              id: 'new-net-vpn-public',
-              projectId: '',
-              name: 'Public',
-              cidr: '0.0.0.0/0',
-              type: 'public' as const
-            }
-          ],
-          volumes: [],
-          ips: [
-            {
-              id: 'new-pip-vpn',
-              projectId: '',
-              ip: '0.0.0.0',
-              attachedToVmId: 'new-vm-vpn'
-            }
-          ]
-        };
+        return [{ name: 'vpn-gateway', role: 'vpn', os: 'Ubuntu 24.04', cpu: 1, ram: 2, disk: 30, portsOpen: [22, 51820] }];
       }
-
       if (template === 'Static Site') {
-        return {
-          vms: [
-            {
-              id: 'new-vm-static',
-              projectId: '',
-              name: 'static-web',
-              role: 'frontend' as const,
-              os: 'Ubuntu 24.04',
-              cpu: 1,
-              ram: 2,
-              disk: 25,
-              publicIp: '0.0.0.0',
-              privateIp: '10.0.50.10',
-              state: 'provisioning' as const,
-              monthlyCost: 16,
-              portsOpen: [80, 443]
-            }
-          ],
-          networks: [
-            {
-              id: 'new-net-static-public',
-              projectId: '',
-              name: 'Public',
-              cidr: '0.0.0.0/0',
-              type: 'public' as const
-            }
-          ],
-          volumes: [],
-          ips: [
-            {
-              id: 'new-pip-static',
-              projectId: '',
-              ip: '0.0.0.0',
-              attachedToVmId: 'new-vm-static'
-            }
-          ]
-        };
+        return [{ name: 'static-web', role: 'frontend', os: 'Ubuntu 24.04', cpu: 1, ram: 2, disk: 25, portsOpen: [80, 443] }];
       }
-
       if (template === 'Backend API') {
-        return {
-          vms: [
-            {
-              id: 'new-vm-api',
-              projectId: '',
-              name: 'api-backend',
-              role: 'backend' as const,
-              os: 'Ubuntu 24.04',
-              cpu: size === 'l' ? 4 : 2,
-              ram: size === 'l' ? 8 : 4,
-              disk: 80,
-              publicIp: '0.0.0.0',
-              privateIp: '10.0.60.10',
-              state: 'provisioning' as const,
-              monthlyCost: size === 'l' ? 48 : 28,
-              portsOpen: [80, 8000]
-            }
-          ],
-          networks: [
-            {
-              id: 'new-net-api-public',
-              projectId: '',
-              name: 'Public',
-              cidr: '0.0.0.0/0',
-              type: 'public' as const
-            }
-          ],
-          volumes: [],
-          ips: [
-            {
-              id: 'new-pip-api',
-              projectId: '',
-              ip: '0.0.0.0',
-              attachedToVmId: 'new-vm-api'
-            }
-          ]
-        };
+        return [{ name: 'api-backend', role: 'backend', os: 'Ubuntu 24.04', cpu: size === 'l' ? 4 : 2, ram: size === 'l' ? 8 : 4, disk: 80, portsOpen: [80, 8000] }];
       }
-
-      // SaaS, AI Inference, Custom — простая трёхзвенная схема
-      return {
-        vms: [
-          {
-            id: 'new-vm-front',
-            projectId: '',
-            name: 'frontend',
-            role: 'frontend' as const,
-            os: 'Ubuntu 24.04',
-            cpu: 2,
-            ram: 4,
-            disk: 50,
-            publicIp: '0.0.0.0',
-            privateIp: '10.0.70.10',
-            state: 'provisioning' as const,
-            monthlyCost: 24,
-            portsOpen: [80, 443]
-          },
-          {
-            id: 'new-vm-back',
-            projectId: '',
-            name: 'backend',
-            role: 'backend' as const,
-            os: 'Ubuntu 24.04',
-            cpu: 2,
-            ram: 4,
-            disk: 80,
-            privateIp: '10.0.70.20',
-            state: 'provisioning' as const,
-            monthlyCost: 26,
-            portsOpen: [8000]
-          },
-          {
-            id: 'new-vm-db',
-            projectId: '',
-            name: 'db',
-            role: 'db' as const,
-            os: 'Ubuntu 24.04',
-            cpu: 2,
-            ram: 8,
-            disk: 120,
-            privateIp: '10.0.70.30',
-            state: 'provisioning' as const,
-            monthlyCost: 32,
-            portsOpen: [5432]
-          }
-        ],
-        networks: [
-          {
-            id: 'new-net-public',
-            projectId: '',
-            name: 'Public',
-            cidr: '0.0.0.0/0',
-            type: 'public' as const
-          },
-          {
-            id: 'new-net-private',
-            projectId: '',
-            name: 'Private',
-            cidr: '10.0.70.0/24',
-            type: 'private' as const
-          }
-        ],
-        volumes: [],
-        ips: [
-          {
-            id: 'new-pip-front',
-            projectId: '',
-            ip: '0.0.0.0',
-            attachedToVmId: 'new-vm-front'
-          }
-        ]
-      };
+      // SaaS, AI Inference, Custom
+      return [
+        { name: 'frontend', role: 'frontend', os: 'Ubuntu 24.04', cpu: 2, ram: 4, disk: 50, portsOpen: [80, 443] },
+        { name: 'backend', role: 'backend', os: 'Ubuntu 24.04', cpu: 2, ram: 4, disk: 80, portsOpen: [8000] },
+        { name: 'db', role: 'db', os: 'Ubuntu 24.04', cpu: 2, ram: 8, disk: 120, portsOpen: [5432] },
+      ];
     })();
 
-    const projectId = addProject({
-      name: baseName,
-      description,
-      template,
-      region,
-      status: 'provisioning',
-      resources
-    });
-
-    setStatus(projectId, 'provisioning');
-
-    window.setTimeout(() => {
-      setStatus(projectId, 'running');
-    }, 2000);
-
-    navigate(`/projects/${projectId}`);
+    try {
+      const projectId = await createProjectRemote({ name: baseName, description, template, region, vms });
+      navigate(`/projects/${projectId}`);
+    } catch {
+      // error is stored in store.apiError
+    }
   };
 
   return (
@@ -461,8 +273,10 @@ export function ProjectWizardPage() {
                 type="button"
                 className="projects-create-btn"
                 onClick={handleCreate}
+                disabled={isLoading}
+                style={isLoading ? { opacity: 0.6, cursor: 'default' } : undefined}
               >
-                Создать проект
+                {isLoading ? 'Создаётся…' : 'Создать проект'}
               </button>
             )}
           </div>
@@ -474,7 +288,7 @@ export function ProjectWizardPage() {
           selectTemplate: (tpl) => setTemplate(tpl),
           setRegion: (reg) => setRegion(reg),
           setSize: (s) => setSize(s),
-          createProject: () => handleCreate()
+          createProject: () => { void handleCreate(); }
         }}
       />
     </section>
