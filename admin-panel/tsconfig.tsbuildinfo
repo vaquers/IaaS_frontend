@@ -1,1 +1,0 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/theme.ts","./src/vite-env.d.ts","./src/components/button.tsx","./src/components/card.tsx","./src/components/layout.tsx","./src/pages/auditlog.tsx","./src/pages/billingdebt.tsx","./src/pages/infrahosts.tsx","./src/pages/overview.tsx","./src/pages/templates.tsx","./src/pages/tenants.tsx","./src/pages/vmfleet.tsx"],"version":"5.6.3"}
