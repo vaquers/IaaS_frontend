@@ -22,6 +22,11 @@ export interface ProjectsState extends UiState {
   setHighlightedVm(vmId: string | undefined): void;
   setProjectStatus(projectId: string, status: ProjectStatus): void;
   completeChecklistStep(projectId: string, stepId: ChecklistStepId): void;
+  toggleChecklistStep(projectId: string, stepId: ChecklistStepId): void;
+  addChecklistStep(
+    projectId: string,
+    input: { label: string; description: string }
+  ): void;
   toggleVmPort(vmId: string, port: number): void;
   setVmPorts(vmId: string, ports: number[]): void;
   addProject(project: Omit<Project, 'id' | 'createdAt' | 'checklist'>): string;
@@ -317,6 +322,44 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
               checklist: project.checklist.map((step) =>
                 step.id === stepId ? { ...step, done: true } : step
               )
+            }
+      )
+    }));
+  },
+
+  toggleChecklistStep(projectId, stepId) {
+    set((state) => ({
+      projects: state.projects.map((project) =>
+        project.id !== projectId
+          ? project
+          : {
+              ...project,
+              checklist: project.checklist.map((step) =>
+                step.id === stepId ? { ...step, done: !step.done } : step
+              )
+            }
+      )
+    }));
+  },
+
+  addChecklistStep(projectId, input) {
+    const id: ChecklistStepId = `custom-${Date.now()}`;
+
+    set((state) => ({
+      projects: state.projects.map((project) =>
+        project.id !== projectId
+          ? project
+          : {
+              ...project,
+              checklist: [
+                ...project.checklist,
+                {
+                  id,
+                  label: input.label,
+                  description: input.description,
+                  done: false
+                }
+              ]
             }
       )
     }));

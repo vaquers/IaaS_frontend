@@ -1,10 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { ProjectTab } from '../../domain/iaasTypes';
 import { useProjectsStore } from '../../store/projectsStore';
 import './ProjectsPages.css';
 import '../ServersPage.css';
 import { ProjectGraphTab } from './ProjectGraphTab';
+import { ProjectFilesTab } from './ProjectFilesTab';
+import { ProjectLaunchTab } from './ProjectLaunchTab';
+import { ProjectNetworkTab } from './ProjectNetworkTab';
 import { AIAssistantWidget } from '../../components/AIAssistantWidget';
 
 function useQuery() {
@@ -25,6 +28,8 @@ export function ProjectDetailPage() {
   const query = useQuery();
 
   const projects = useProjectsStore((state) => state.projects);
+  const toggleChecklistStep = useProjectsStore((state) => state.toggleChecklistStep);
+  const addChecklistStep = useProjectsStore((state) => state.addChecklistStep);
   const selectedTab = (query.get('tab') as ProjectTab) ?? 'overview';
   const setVmPorts = useProjectsStore((state) => state.setVmPorts);
 
@@ -34,6 +39,10 @@ export function ProjectDetailPage() {
   );
 
   const setSelectedProject = useProjectsStore((state) => state.setSelectedProject);
+
+  const [isAddingStep, setIsAddingStep] = useState(false);
+  const [newStepLabel, setNewStepLabel] = useState('');
+  const [newStepDescription, setNewStepDescription] = useState('');
 
   if (!project) {
     return (
@@ -56,6 +65,33 @@ export function ProjectDetailPage() {
     const searchParams = new URLSearchParams(query);
     searchParams.set('tab', tab);
     navigate({ pathname: `/projects/${project.id}`, search: searchParams.toString() });
+  };
+
+  const handleToggleStep = (stepId: string) => {
+    toggleChecklistStep(project.id, stepId);
+  };
+
+  const handleStartAddingStep = () => {
+    setIsAddingStep(true);
+  };
+
+  const handleSubmitNewStep: React.FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    const trimmedLabel = newStepLabel.trim();
+    const trimmedDescription = newStepDescription.trim();
+
+    if (!trimmedLabel) {
+      return;
+    }
+
+    addChecklistStep(project.id, {
+      label: trimmedLabel,
+      description: trimmedDescription || 'Описание шага'
+    });
+
+    setNewStepLabel('');
+    setNewStepDescription('');
+    setIsAddingStep(false);
   };
 
   return (
@@ -86,27 +122,87 @@ export function ProjectDetailPage() {
             <div className="servers-title">Чеклист запуска</div>
           </div>
 
-          <div className="servers-list">
+          <div className="project-checklist">
             {project.checklist.map((step) => (
-              <article key={step.id} className="server-card">
-                <div className="server-card-grid-row">
-                  <div className="server-cell">
-                    <span className="server-cell-title">{step.label}</span>
+              <button
+                key={step.id}
+                type="button"
+                className="project-checklist-item project-checklist-item-button"
+                aria-label={step.label}
+                aria-pressed={step.done}
+                onClick={() => handleToggleStep(step.id)}
+              >
+                <div
+                  className={
+                    step.done
+                      ? 'project-checklist-bullet project-checklist-bullet-done'
+                      : 'project-checklist-bullet'
+                  }
+                  aria-hidden="true"
+                />
+                <div className="project-checklist-text">
+                  <div
+                    className={
+                      step.done
+                        ? 'project-checklist-label project-checklist-label-done'
+                        : 'project-checklist-label'
+                    }
+                  >
+                    {step.label}
                   </div>
-                  <div className="server-cell">
-                    <span>{step.description}</span>
-                  </div>
-                  <div className="server-cell server-actions">
-                    <button
-                      type="button"
-                      className="server-btn server-btn-secondary"
-                    >
-                      {step.done ? 'Готово' : 'Сделать'}
-                    </button>
+                  <div className="project-checklist-description">
+                    {step.description}
                   </div>
                 </div>
-              </article>
+                <div
+                  className={
+                    step.done
+                      ? 'project-checklist-status project-checklist-status-done'
+                      : 'project-checklist-status project-checklist-status-todo'
+                  }
+                >
+                  {step.done ? 'Готово' : 'Сделать'}
+                </div>
+              </button>
             ))}
+
+            {isAddingStep ? (
+              <form
+                className="project-checklist-add-form"
+                onSubmit={handleSubmitNewStep}
+              >
+                <div className="project-checklist-bullet" aria-hidden="true" />
+                <div className="project-checklist-text">
+                  <input
+                    className="project-checklist-input"
+                    placeholder="Новый шаг"
+                    value={newStepLabel}
+                    onChange={(event) => setNewStepLabel(event.target.value)}
+                    autoFocus
+                  />
+                  <input
+                    className="project-checklist-input project-checklist-input-secondary"
+                    placeholder="Краткое описание (опционально)"
+                    value={newStepDescription}
+                    onChange={(event) => setNewStepDescription(event.target.value)}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="project-checklist-status project-checklist-status-todo"
+                >
+                  Добавить
+                </button>
+              </form>
+            ) : (
+              <button
+                type="button"
+                className="project-checklist-add-btn"
+                onClick={handleStartAddingStep}
+              >
+                + Добавить шаг
+              </button>
+            )}
           </div>
 
           <div className="projects-header-row">
@@ -136,47 +232,62 @@ export function ProjectDetailPage() {
           {selectedTab === 'overview' && (
             <div className="servers-list">
               {project.resources.vms.map((vm) => (
-                <article key={vm.id} className="server-card">
-                  <div className="server-card-grid-header" aria-hidden="true">
-                    <span>Сервер</span>
-                    <span>Роль</span>
-                    <span>ОС</span>
-                    <span>IP</span>
-                    <span>Стоимость</span>
-                    <span />
-                  </div>
-                  <div className="server-card-grid-row">
-                    <div className="server-cell">
-                      <span className="server-cell-title">{vm.name}</span>
+                <article key={vm.id} className="server-card" role="row">
+                  <div className="server-row">
+                    <div className="server-col server-col-server">
+                      <div className="server-label">Сервер</div>
+                      <div className="server-divider" />
+                      <div className="server-value server-value-name">
+                        {vm.name}
+                      </div>
                     </div>
-                    <div className="server-cell">
-                      <span>{vm.role}</span>
+
+                    <div className="server-col server-col-project">
+                      <div className="server-label">Роль</div>
+                      <div className="server-divider" />
+                      <div className="server-value">
+                        {vm.role}
+                      </div>
                     </div>
-                    <div className="server-cell">
-                      <span>{vm.os}</span>
+
+                    <div className="server-col server-col-os">
+                      <div className="server-label">Операционная система</div>
+                      <div className="server-divider" />
+                      <div className="server-value server-os-text">
+                        {vm.os}
+                      </div>
                     </div>
-                    <div className="server-cell">
-                      <span>{vm.publicIp ?? vm.privateIp ?? '—'}</span>
+
+                    <div className="server-col server-col-ip">
+                      <div className="server-label">IP-адреса</div>
+                      <div className="server-divider" />
+                      <div className="server-value server-ip-text server-value-mono">
+                        {vm.publicIp ?? vm.privateIp ?? '—'}
+                      </div>
                     </div>
-                    <div className="server-cell">
-                      <span className="server-price">
+
+                    <div className="server-col server-col-price">
+                      <div className="server-label">Стоимость</div>
+                      <div className="server-divider" />
+                      <div className="server-value server-price">
                         {vm.monthlyCost.toFixed(0)} BYN/мес
-                      </span>
+                      </div>
                     </div>
-                    <div className="server-cell server-actions">
-                      <button
-                        type="button"
-                        className="server-btn server-btn-primary"
-                      >
-                        Смотреть
-                      </button>
-                      <button
-                        type="button"
-                        className="server-btn server-btn-secondary"
-                      >
-                        SSH
-                      </button>
-                    </div>
+                  </div>
+
+                  <div className="server-actions">
+                    <button
+                      type="button"
+                      className="server-btn server-btn-primary"
+                    >
+                      Смотреть
+                    </button>
+                    <button
+                      type="button"
+                      className="server-btn server-btn-secondary"
+                    >
+                      SSH
+                    </button>
                   </div>
                 </article>
               ))}
@@ -185,34 +296,11 @@ export function ProjectDetailPage() {
 
           {selectedTab === 'graph' && <ProjectGraphTab project={project} />}
 
-          {selectedTab === 'files' && (
-            <div className="projects-empty">
-              <h2 className="projects-empty-title">Файлы проекта</h2>
-              <p className="projects-empty-text">
-                Файловый менеджер появится здесь позже. В прототипе это заглушка.
-              </p>
-            </div>
-          )}
+          {selectedTab === 'files' && <ProjectFilesTab project={project} />}
 
-          {selectedTab === 'launch' && (
-            <div className="projects-empty">
-              <h2 className="projects-empty-title">Шаги запуска</h2>
-              <p className="projects-empty-text">
-                В этом разделе будут готовые команды для запуска приложения (apt
-                update, установка зависимостей, запуск сервиса).
-              </p>
-            </div>
-          )}
+          {selectedTab === 'launch' && <ProjectLaunchTab project={project} />}
 
-          {selectedTab === 'network' && (
-            <div className="projects-empty">
-              <h2 className="projects-empty-title">Сеть и порты</h2>
-              <p className="projects-empty-text">
-                Здесь вы сможете включать и выключать порты (HTTP, HTTPS, SSH, База и
-                Custom). Порты будут синхронизироваться с VM.
-              </p>
-            </div>
-          )}
+          {selectedTab === 'network' && <ProjectNetworkTab project={project} />}
         </section>
       </div>
       <AIAssistantWidget

@@ -3,6 +3,8 @@
   grid-template-columns: 320px minmax(0, 1fr);
   gap: 32px;
   align-items: flex-start;
+  margin-left: 30px;
+  margin-right: 30px;
 }
 
 .projects-sidebar {
@@ -115,6 +117,137 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+.project-checklist {
+  background: #f5f5f7;
+  border-radius: 24px;
+  padding: 14px 16px 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.project-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 6px;
+  border-radius: 16px;
+}
+
+.project-checklist-item-button {
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.project-checklist-item + .project-checklist-item {
+  border-top: 1px dashed rgba(17, 17, 17, 0.08);
+}
+
+.project-checklist-bullet {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(120, 120, 128, 0.35);
+  background: #ffffff;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.project-checklist-bullet-done {
+  border-color: #FF0023;
+  background: #FF0023;
+}
+
+.project-checklist-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.project-checklist-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111111;
+}
+
+.project-checklist-label-done {
+  text-decoration: line-through;
+  text-decoration-color: rgba(17, 17, 17, 0.3);
+}
+
+.project-checklist-description {
+  font-size: 12px;
+  color: #777777;
+}
+
+.project-checklist-status {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.project-checklist-status-done {
+  background: rgba(46, 204, 113, 0.16);
+  color: #27ae60;
+}
+
+.project-checklist-status-todo {
+  background: rgba(255, 0, 35, 0.12);
+  color: #FF0023;
+}
+
+.project-checklist-add-btn {
+  margin-top: 6px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px dashed rgba(120, 120, 128, 0.45);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: #FF0023;
+  cursor: default;
+  align-self: stretch;
+}
+
+.project-checklist-add-btn:hover:not(:disabled) {
+  background: rgba(255, 0, 35, 0.04);
+}
+
+.project-checklist-add-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 6px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.project-checklist-input {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 120, 128, 0.25);
+  padding: 6px 10px;
+  font-size: 13px;
+  outline: none;
+}
+
+.project-checklist-input-secondary {
+  margin-top: 4px;
+}
+
+.project-checklist-input:focus {
+  border-color: rgba(255, 0, 35, 0.6);
+  box-shadow: 0 0 0 1px rgba(255, 0, 35, 0.2);
 }
 
 .projects-header-row {
@@ -270,7 +403,7 @@
   border-radius: 999px;
   border: none;
   padding: 8px 16px;
-  font-size: 13px;
+  font-size: 17px;
   font-weight: 500;
   background: #f3f3f5;
   color: #111111;
@@ -306,11 +439,9 @@
 }
 
 .graph-root {
-  position: relative;
-  background: radial-gradient(circle at top left, #1f2430 0, #10131b 40%, #05060a 100%);
-  border-radius: 24px;
-  padding: 14px 14px 18px;
-  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   margin-top: 6px;
 }
 
@@ -318,67 +449,28 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px 16px;
+  gap: 8px 16px;
   font-size: 12px;
-  margin-bottom: 10px;
-  color: #e5e7eb;
+  color: #4b5563;
+  padding: 10px 16px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
 .graph-toolbar label {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-}
-
-.graph-zones {
-  position: absolute;
-  inset: 52px 14px 14px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.graph-zone {
-  border-radius: 20px;
-  font-size: 11px;
-  padding: 4px 8px;
-  align-self: flex-start;
-  margin: 8px;
-  color: #f9fafb;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.graph-zone-public {
-  background: rgba(255, 76, 97, 0.14);
-}
-
-.graph-zone-private {
-  background: rgba(120, 120, 128, 0.16);
-}
-
-.graph-canvas {
-  position: relative;
-  height: 360px;
-  border-radius: 20px;
-  overflow: hidden;
-  background-image:
-    linear-gradient(#141722 1px, transparent 1px),
-    linear-gradient(90deg, #141722 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-position: -1px -1px;
-}
-
-.graph-canvas canvas {
-  background: transparent;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
 }
 
 .graph-sidepanel {
-  margin-top: 14px;
   background: #f5f5f7;
-  border-radius: 20px;
-  padding: 12px 14px;
+  border-radius: 22px;
+  padding: 14px 16px 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
 @media (max-width: 1024px) {
@@ -389,5 +481,563 @@
   .projects-sidebar-panel {
     max-width: 320px;
   }
+}
+
+/* ── Shared VM tab toolbar (Files + Launch) ─────────────────────────── */
+
+.pf-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.pf-vm-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pf-vm-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #f3f3f5;
+  color: #111111;
+  cursor: pointer;
+}
+
+.pf-vm-tab:hover {
+  background: #ececf0;
+}
+
+.pf-vm-tab-active {
+  background: linear-gradient(135deg, #FF0023, #FF0023);
+  color: #ffffff;
+}
+
+.pf-vm-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pf-vm-info {
+  font-size: 12px;
+  color: #888888;
+  font-family: ui-monospace, 'SF Mono', monospace;
+}
+
+/* ── Files tab ──────────────────────────────────────────────────────── */
+
+.pf-root {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 20px 18px 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.06);
+}
+
+.pf-tree-header {
+  display: grid;
+  grid-template-columns: 1fr 80px 120px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #aaaaaa;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  margin-bottom: 4px;
+}
+
+.pf-tree {
+  display: flex;
+  flex-direction: column;
+}
+
+.pf-row {
+  display: grid;
+  grid-template-columns: auto 1fr 80px 120px;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #222222;
+  min-height: 34px;
+}
+
+.pf-row:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.pf-row-dir {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.pf-icon {
+  font-size: 13px;
+  width: 16px;
+  text-align: center;
+  color: #888888;
+  flex-shrink: 0;
+}
+
+.pf-name {
+  font-family: ui-monospace, 'SF Mono', monospace;
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pf-meta {
+  font-size: 12px;
+  color: #999999;
+  font-family: ui-monospace, 'SF Mono', monospace;
+  text-align: right;
+}
+
+.pf-meta-muted {
+  color: #bbbbbb;
+}
+
+.pf-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.pf-footer-note {
+  font-size: 12px;
+  color: #aaaaaa;
+}
+
+/* ── Launch tab ─────────────────────────────────────────────────────── */
+
+.pl-root {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 20px 18px 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.06);
+}
+
+.pl-phases {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pl-phase {
+  background: #f5f5f7;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.pl-phase-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.pl-phase-number {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF0023, #FF0023);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.pl-phase-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111111;
+}
+
+.pl-phase-description {
+  font-size: 12px;
+  color: #888888;
+  margin-top: 2px;
+}
+
+.pl-commands {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.pl-cmd-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.pl-cmd-row:last-child {
+  border-bottom: none;
+}
+
+.pl-cmd-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pl-cmd-prompt {
+  font-size: 13px;
+  font-family: ui-monospace, 'SF Mono', monospace;
+  color: #FF0023;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.pl-cmd-text {
+  font-size: 12.5px;
+  font-family: ui-monospace, 'SF Mono', monospace;
+  color: #111111;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  flex: 1;
+}
+
+.pl-cmd-aside {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.pl-cmd-comment {
+  font-size: 11px;
+  color: #aaaaaa;
+  font-family: ui-monospace, 'SF Mono', monospace;
+  white-space: nowrap;
+}
+
+.pl-copy-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #ececf0;
+  color: #555555;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.pl-copy-btn:hover {
+  background: #e0e0e5;
+}
+
+.pl-copy-btn-done {
+  background: rgba(46, 204, 113, 0.16);
+  color: #27ae60;
+}
+
+/* ── Network tab ────────────────────────────────────────────────────── */
+
+.pn-root {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.pn-section {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 20px 18px 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.06);
+}
+
+.pn-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111111;
+  margin-bottom: 4px;
+}
+
+.pn-section-description {
+  font-size: 12px;
+  color: #888888;
+  margin-bottom: 16px;
+}
+
+.pn-vm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pn-vm-card {
+  background: #f5f5f7;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.pn-vm-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.pn-vm-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pn-vm-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pn-vm-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111111;
+  font-family: ui-monospace, 'SF Mono', monospace;
+}
+
+.pn-vm-role {
+  font-size: 11px;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.08);
+  color: #555555;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.pn-vm-card-ip {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  font-family: ui-monospace, 'SF Mono', monospace;
+  color: #555555;
+}
+
+.pn-ip-tag {
+  font-size: 10px;
+  font-weight: 500;
+  color: #aaaaaa;
+  font-family: inherit;
+}
+
+.pn-ports-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.pn-port-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 16px;
+  gap: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  transition: background 0.1s;
+}
+
+.pn-port-row:last-child {
+  border-bottom: none;
+}
+
+.pn-port-row-open {
+  background: rgba(46, 204, 113, 0.05);
+}
+
+.pn-port-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pn-port-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111111;
+}
+
+.pn-port-number {
+  font-size: 12px;
+  font-family: ui-monospace, 'SF Mono', monospace;
+  color: #888888;
+}
+
+.pn-port-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pn-port-badge {
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+
+.pn-port-badge-open {
+  background: rgba(46, 204, 113, 0.16);
+  color: #27ae60;
+}
+
+.pn-port-badge-closed {
+  background: rgba(0, 0, 0, 0.07);
+  color: #888888;
+}
+
+.pn-toggle {
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.pn-toggle-on {
+  background: #2ecc71;
+}
+
+.pn-toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s;
+}
+
+.pn-toggle-on .pn-toggle-knob {
+  transform: translateX(18px);
+}
+
+.pn-networks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pn-net-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f5f5f7;
+  border-radius: 14px;
+  padding: 12px 16px;
+}
+
+.pn-net-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.pn-net-info {
+  flex: 1;
+}
+
+.pn-net-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111111;
+}
+
+.pn-net-cidr {
+  font-size: 12px;
+  font-family: ui-monospace, 'SF Mono', monospace;
+  color: #888888;
+  margin-top: 2px;
+}
+
+.pn-net-badge {
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.pn-net-badge-public {
+  background: rgba(52, 152, 219, 0.12);
+  color: #2980b9;
+}
+
+.pn-net-badge-private {
+  background: rgba(0, 0, 0, 0.07);
+  color: #555555;
+}
+
+/* ── Firewall extension (extra columns: source + description) ───────── */
+
+.pn-fw-list-header {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #aaaaaa;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.pn-fw-row {
+  display: grid !important;
+  grid-template-columns: 180px 1fr 1fr auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.pn-fw-source {
+  font-size: 12px;
+  font-family: ui-monospace, 'SF Mono', monospace;
+  color: #666666;
+}
+
+.pn-fw-desc {
+  font-size: 12.5px;
+  color: #444444;
 }
 
