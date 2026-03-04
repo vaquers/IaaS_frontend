@@ -8,7 +8,7 @@ export type ProjectTemplate =
 
 export type ProjectStatus = 'draft' | 'provisioning' | 'running' | 'error';
 
-export type VmRole = 'frontend' | 'backend' | 'db' | 'worker' | 'vpn';
+export type VmRole = 'frontend' | 'backend' | 'db' | 'worker' | 'vpn' | 'proxy' | 'custom';
 
 export interface VM {
   id: string;
@@ -21,6 +21,7 @@ export interface VM {
   disk: number;
   publicIp?: string;
   privateIp?: string;
+  networkId?: string;
   state: 'running' | 'stopped' | 'provisioning';
   monthlyCost: number;
   portsOpen: number[];
@@ -49,7 +50,10 @@ export interface PublicIP {
   attachedToVmId?: string;
 }
 
-export type ChecklistStepId = 'connect' | 'upload' | 'run' | 'expose';
+// Идентификатор шага чеклиста.
+// Базовые шаги используют предопределённые значения, но тип расширен до string,
+// чтобы поддерживать пользовательские шаги, добавленные из интерфейса.
+export type ChecklistStepId = string;
 
 export interface ChecklistStep {
   id: ChecklistStepId;
@@ -76,4 +80,11 @@ export interface Project {
 }
 
 export type ProjectTab = 'overview' | 'graph' | 'files' | 'launch' | 'network';
+
+export interface ProjectResources {
+  project: Project;
+  vms: VM[];
+  networks: Network[];
+  volumes: Volume[];
+}
 
